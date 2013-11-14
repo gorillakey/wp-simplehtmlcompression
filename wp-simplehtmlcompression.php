@@ -11,32 +11,25 @@ Author Email: hello@gorillakey.com
 
 function wp_compress_html()
 {
-
 function wp_compress_html_main ($buffer)
 {
-	$initial=strlen($buffer);
-	$buffer=explode("  ", $buffer);
-	$count=count ($buffer);
+	$search = array(
+	'/\>[^\S ]+/s',
+	'/[^\S ]+\</s',
+	'/(\s)+/s'
+	);
+	$replace = array(
+	'>',
+	'<',
+	'\\1'
+	);
 
-	for ($i = 0; $i <= $count; $i++)
-	{
-			$buffer[$i]=(str_replace("\t", " ", $buffer[$i]));
-			$buffer[$i]=(str_replace("\n\n", "\n", $buffer[$i]));
-			$buffer[$i]=(str_replace("\n", "", $buffer[$i]));
-			$buffer[$i]=(str_replace("\r", "", $buffer[$i]));
-
-			while (stristr($buffer[$i], '  '))
-			{
-			$buffer[$i]=(str_replace("  ", " ", $buffer[$i]));
-			}
-		$buffer_out.=$buffer[$i];
-	}
-	$buffer_out = preg_replace('/<!--(.|\s)*?-->/', '', $buffer_out);
-	return $buffer_out;
+	$buffer = trim($buffer);
+	$buffer = preg_replace($search, $replace, $buffer);
+	$buffer = trim($buffer);
+	return $buffer;
 }
-
 ob_start("wp_compress_html_main");
 }
-
 add_action('get_header', 'wp_compress_html');
 ?>
